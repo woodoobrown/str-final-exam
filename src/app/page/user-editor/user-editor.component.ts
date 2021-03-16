@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { User } from 'src/app/model/user';
 import { UserService } from 'src/app/service/user.service';
@@ -12,6 +12,8 @@ import { UserService } from 'src/app/service/user.service';
   styleUrls: ['./user-editor.component.scss']
 })
 export class UserEditorComponent implements OnInit {
+
+  user: User = new User();
 
   /**
    * user$ {Observable<User>}
@@ -29,12 +31,30 @@ export class UserEditorComponent implements OnInit {
     })
   );
 
+
+
   constructor(
     private userService: UserService,
     private activatedRoute: ActivatedRoute,
-  ) { }
+    private router: Router,
+  ) {
+    this.userService.getAll();
+    this.activatedRoute.params.subscribe(
+      params =>
+        this.userService.get(params.id).subscribe(
+          user => {
+            this.user = user || new User();
+          }
+        )
+    );
+   }
 
   ngOnInit(): void {
+  }
+
+  onFormSubmit(form: NgForm): void {
+    this.userService.update(this.user);
+    this.router.navigate(['users'])
   }
 
 }

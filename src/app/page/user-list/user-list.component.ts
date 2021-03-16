@@ -10,13 +10,33 @@ import { UserService } from 'src/app/service/user.service';
 })
 export class UserListComponent implements OnInit {
 
-  users$: Observable<User[]> = this.userService.getAll();
+  users$: Observable<User[]> = this.userService.users$;
+
+  columnKey: string = '';
+  phrase: string = '';
 
   constructor(
     private userService: UserService,
   ) { }
 
   ngOnInit(): void {
+    this.userService.getAll();
+  }
+
+  onDeleteUser(user: User): void {
+    this.userService.remove(user).subscribe(
+      () => {
+        this.userService.getAll();
+      }
+    );
+  }
+
+  onColumnSelect(key: string) {
+    this.columnKey = key;
+  }
+
+  onChangePhrase(event: Event): void {
+    this.phrase = (event.target as HTMLInputElement).value;
   }
 
 }
